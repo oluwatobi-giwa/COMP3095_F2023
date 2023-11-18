@@ -18,15 +18,15 @@ import java.util.List;
 public class InventoryService implements IInventoryService {
     private final InventoryRepository inventoryRepository;
 
-    @Override
-    @Transactional(readOnly = true)
+    /*@Override
     public boolean isInStock(String skuCode) {
         return inventoryRepository.findBySkuCode(skuCode).isPresent();
-    }
+    }*/
 
 
-
-    /*public List<InventoryResponse> isInStock(List<InventoryRequest> requests) {
+    @Override
+    @Transactional(readOnly = true)
+    public List<InventoryResponse> isInStock(List<InventoryRequest> requests) {
         List<Inventory> availableInventory = inventoryRepository.findAllByInventoryRequests(requests);
 
         return requests.stream().map(request -> {
@@ -45,5 +45,5 @@ public class InventoryService implements IInventoryService {
                         .build();
             }
         }).toList();
-    }*/
+    }
 }

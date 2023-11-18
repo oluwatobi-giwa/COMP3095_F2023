@@ -34,6 +34,7 @@ dependencies {
     implementation("org.testcontainers:junit-jupiter:1.18.1")
     implementation("org.testcontainers:mockserver:1.18.1")
     implementation("org.testcontainers:postgresql:1.18.1")
+    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:4.0.3")
 }
 
 tasks.withType<Test> {

@@ -19,7 +19,7 @@ services:
 
   order-service:
     ports:
-      - "8083:8083"
+      - "8082:8082"
     build:
       context: ./order-service
       dockerfile: ./Dockerfile
@@ -34,7 +34,7 @@ services:
 
   inventory-service:
     ports:
-      - "8085:8085"
+      - "8083:8083"
     build:
       context: ./inventory-service
       dockerfile: ./Dockerfile
@@ -47,6 +47,17 @@ services:
     networks:
       - spring
 
+  discovery-service:
+    ports:
+      - "8761:8761"
+    build:
+      context: ./discovery-service
+      dockerfile: ./Dockerfile
+    image: discovery-service:1.0
+    container_name: discovery-service
+    environment:
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+
 
   mongodb:
     ports:
@@ -57,7 +68,7 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=rootadmin
       - MONGO_INITDB_ROOT_PASSWORD=password
     volumes:
-      - ./data/mongo/coursework:/data/db
+      - ./data/mongo/products:/data/db # source:destination
       - ./data/mongo/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
     restart: unless-stopped
     command: mongod --auth
@@ -89,7 +100,7 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=order-service
     volumes:
-      - ./data/postgres/order-service:/var/lib/postgresql/data
+      - ./data/postgres/order-service:/data/postgres # source:destination
       - ./init/postgres/order-service/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
     networks:
@@ -98,7 +109,7 @@ services:
 
   postgres-inventory:
     ports:
-      - "5433:5434"
+      - "5434:5432"
     image: postgres:latest
     container_name: Postgres-Inventory
     environment:
@@ -106,7 +117,7 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=inventory-service
     volumes:
-      - ./data/postgres/inventory-service:/var/lib/postgresql/data
+      - ./data/postgres/inventory-service:/data/postgres # source:destination
       - ./init/postgres/inventory-service/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: unless-stopped
     networks:

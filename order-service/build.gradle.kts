@@ -34,6 +34,9 @@ dependencies {
 	implementation("org.testcontainers:junit-jupiter:1.18.1")
 	implementation("org.testcontainers:mockserver:1.18.1")
 	implementation("org.testcontainers:postgresql:1.18.1")
+	implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.4")
+	implementation("org.apache.httpcomponents.client5:httpclient5:5.2.1")
+	implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:4.0.3")
 
 }
 

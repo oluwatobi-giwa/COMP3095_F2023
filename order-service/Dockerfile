@@ -9,10 +9,7 @@ FROM openjdk:17
 RUN mkdir /app
 COPY --from=builder /home/gradle/src/build/libs/*.jar /app/order-service.jar
 
-#ENV MONGO_DB_USERNAME=rootadmin \
-#MONGO_DB_PASSWORD=password
-
-EXPOSE 8083
+EXPOSE 8082
 
 ENV SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5431/order-service \
 SPRING_DATASOURCE_USERNAME=admin \

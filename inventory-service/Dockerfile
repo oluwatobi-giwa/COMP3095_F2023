@@ -9,9 +9,9 @@ FROM openjdk:17
 RUN mkdir /app
 COPY --from=builder /home/gradle/src/build/libs/*.jar /app/inventory-service.jar
 
-EXPOSE 8085
+EXPOSE 8083
 
-ENV SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5433/inventory-service \
+ENV SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5434/inventory-service \
 SPRING_DATASOURCE_USERNAME=admin \
 SPRING_DATASOURCE_PASSWORD=password
 
