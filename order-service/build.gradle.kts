@@ -37,6 +37,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.4")
 	implementation("org.apache.httpcomponents.client5:httpclient5:5.2.1")
 	implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:4.0.3")
+	testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 
 }
 

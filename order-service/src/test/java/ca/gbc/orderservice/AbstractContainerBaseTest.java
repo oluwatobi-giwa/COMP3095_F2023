@@ -38,7 +38,7 @@ public class AbstractContainerBaseTest {
         }
     }
 
-    @BeforeAll
+    /*@BeforeAll
     public static void startContainers() {
         postgreSQLContainer.start();
     }
@@ -46,5 +46,5 @@ public class AbstractContainerBaseTest {
     @AfterAll
     public static void stopContainers() {
         postgreSQLContainer.stop();
-    }
+    }*/
 }

@@ -5,7 +5,10 @@ import ca.gbc.orderservice.dto.OrderRequest;
 import ca.gbc.orderservice.repository.OrderRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import okhttp3.mockwebserver.MockWebServer;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,8 @@ class OrderServiceApplicationTests extends AbstractContainerBaseTest {
 	@Autowired
 	private MockMvc mockMvc;
 
+	private static MockWebServer mockWebServer;
+
 	@Autowired
 	private OrderRepository orderRepository;
 
@@ -39,6 +44,17 @@ class OrderServiceApplicationTests extends AbstractContainerBaseTest {
 		return OrderRequest.builder()
 				.orderLineItemDtoList(Collections.singletonList(orderLineItemDto))
 				.build();
+	}
+
+	@BeforeAll
+	static void setupServer() throws Exception {
+		mockWebServer = new MockWebServer();
+		mockWebServer.start();System.setProperty("inventory.service.url", "http://localhost:" + mockWebServer.getPort());
+	}
+
+	@AfterAll
+	static void tearDownServer() throws Exception {
+		mockWebServer.shutdown();
 	}
 
 
