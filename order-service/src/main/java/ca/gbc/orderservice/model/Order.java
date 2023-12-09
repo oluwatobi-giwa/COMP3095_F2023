@@ -16,10 +16,10 @@ import java.util.List;
 @NoArgsConstructor
 public class Order {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String orderNumber;
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private List<OrderLineItem> orderLineItemList;
 
+    @OneToMany(fetch=FetchType.EAGER,cascade = CascadeType.ALL)
+    private List<OrderLineItem> orderLineItemList;
 }

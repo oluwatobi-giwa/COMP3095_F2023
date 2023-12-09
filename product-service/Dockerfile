@@ -1,13 +1,36 @@
-# Build Stage
-FROM gradle:8.3.0-jdk17-alpine AS builder
-COPY --chown=gradle:gradle . /home/gradle/src/
-WORKDIR /home/gradle/src/
+#--------------------------------
+#Dockerfile for product-service
+#--------------------------------
+
+#-------------
+#Build Stage
+#-------------
+
+#base image
+FROM gradle:8-jdk17-alpine AS builder
+
+#Copy the application files from the host machine to the image filesystem
+COPY --chown=gradle:gradle . /home/gradle/src
+
+#Set the directory within the image, for executing future commands
+WORKDIR /home/gradle/src
+
+#Run gradle build within the container - NOT THE HOST MACHINE
 RUN gradle build -x test
 
-# Package Stage
+#----------------
+#Package Stage
+#----------------
 FROM openjdk:17-alpine
+
 RUN mkdir /app
+
 COPY --from=builder /home/gradle/src/build/libs/*.jar /app/product-service.jar
-EXPOSE 8084
-ENV MONGO_DB_USERNAME=rootadmin MONGO_DB_PASSWORD=password
+
+ENV MONGO_DB_USERNAME=rootadmin \
+    MONGO_DB_PASSWORD=password
+
+EXPOSE 8089
+
 ENTRYPOINT ["java", "-jar", "/app/product-service.jar"]
+

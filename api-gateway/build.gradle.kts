@@ -1,39 +1,38 @@
 plugins {
-	java
-	id("org.springframework.boot") version "3.1.5"
-	id("io.spring.dependency-management") version "1.1.3"
+    java
+    id("org.springframework.boot") version "3.1.5"
+    id("io.spring.dependency-management") version "1.1.3"
 }
 
 group = "ca.gbc"
 version = "0.0.1-SNAPSHOT"
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
-
-extra["springCloudVersion"] = "2022.0.4"
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter")
-	implementation("org.springframework.cloud:spring-cloud-starter-gateway")
-	implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
+    implementation("org.springframework.boot:spring-boot-starter")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    implementation("org.springframework.cloud:spring-cloud-starter-gateway:4.0.8")
+    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:4.0.3")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server:3.1.5")
+    implementation("org.springframework.boot:spring-boot-starter-security:3.1.5")
 
-dependencyManagement {
-	imports {
-		mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
-	}
+    implementation("io.micrometer:micrometer-observation:1.12.0")
+    implementation("io.micrometer:micrometer-tracing-bridge-brave:1.2.0")
+    implementation("io.zipkin.reporter2:zipkin-reporter-brave:2.16.4")
+    implementation("org.springframework.boot:spring-boot-actuator:3.2.0")
 }
 
 tasks.withType<Test> {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 tasks.bootBuildImage {
-	builder.set("paketobuildpacks/builder-jammy-base:latest")
+    builder.set("paketobuildpacks/builder-jammy-base:latest")
 }

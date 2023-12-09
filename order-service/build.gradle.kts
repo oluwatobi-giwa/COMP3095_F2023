@@ -30,17 +30,24 @@ dependencies {
 	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	implementation("org.testcontainers:testcontainers-bom:1.18.1")
-	implementation("org.testcontainers:junit-jupiter:1.18.1")
-	implementation("org.testcontainers:mockserver:1.18.1")
-	implementation("org.testcontainers:postgresql:1.18.1")
-	implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.4")
+	implementation("org.testcontainers:testcontainers-bom:1.18.3")
+	testImplementation("org.testcontainers:postgresql:1.18.3")
+	testImplementation("org.testcontainers:junit-jupiter:1.18.3")
 	implementation("org.apache.httpcomponents.client5:httpclient5:5.2.1")
 	implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:4.0.3")
 	testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+	implementation("org.springframework.boot:spring-boot-starter-webflux:3.1.5")
+	implementation("org.springframework.cloud:spring-cloud-starter-circuitbreaker-resilience4j:3.0.3")
+
+	implementation("io.micrometer:micrometer-observation:1.12.0")
+	implementation("io.micrometer:micrometer-tracing-bridge-brave:1.2.0")
+	implementation("io.zipkin.reporter2:zipkin-reporter-brave:2.16.4")
+
 
 }
 
-tasks.withType<Test> {
-	useJUnitPlatform()
+
+	tasks.withType<Test> {
+		useJUnitPlatform()
+
 }

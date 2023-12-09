@@ -1,157 +1,206 @@
-# dependency for product service:
+version: '3.8'
 
-version: '3.9'
 services:
-  product-service:
-    ports:
-      - "8084:8084"
-    build:
-      context: ./product-service
-      dockerfile: ./Dockerfile
-    image: product-service:1.0
-    container_name: product-service
-    depends_on:
-      - mongodb
-    networks:
-      - spring
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-
   order-service:
+    image: order-service
     ports:
-      - "8082:8082"
+      - "8087:8087"
     build:
       context: ./order-service
       dockerfile: ./Dockerfile
-    image: order-service:1.0
     container_name: order-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka
     depends_on:
       - postgres-order
     networks:
       - spring
 
   inventory-service:
+    image: inventory-service
     ports:
-      - "8083:8083"
+      - "8088:8088"
     build:
       context: ./inventory-service
       dockerfile: ./Dockerfile
-    image: inventory-service:1.0
     container_name: inventory-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka
     depends_on:
       - postgres-inventory
     networks:
       - spring
 
+  keycloak:
+    image: jboss/keycloak
+    ports:
+      - "8080:8080"
+    environment:
+      JBOSS_LOG_MANAGER_ROOT_LOGGER: DEBUG
+      DB_VENDOR: POSTGRES
+      DB_ADDR: postgres-keycloak
+      DB_DATABASE: keycloak
+      DB_USER: keycloak
+      DB_PASSWORD: password
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: password
+      KEYCLOAK_IMPORT: /opt/jboss/keycloak/realm/spring-boot-microservices-realm.json
+    volumes:
+      - ./realms/:/opt/jboss/keycloak/realm
+    container_name: keycloak
+    depends_on:
+      - postgres-keycloak
+    restart: unless-stopped
+    networks:
+      - spring
+
+  api-gateway:
+    image: api-gateway
+    ports:
+      - "8182:8182"
+    build:
+      context: ./api-gateway
+      dockerfile: ./Dockerfile
+    container_name: api-gateway
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka
+    restart: unless-stopped
+    networks:
+      - spring
+
   discovery-service:
+    image: discovery-service
     ports:
       - "8760:8760"
     build:
       context: ./discovery-service
       dockerfile: ./Dockerfile
-    image: discovery-service:1.0
     container_name: discovery-service
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - eureka.client.serviceUrl.defaultZone=http://discovery-service:8761/eureka/
+      SPRING_PROFILES_ACTIVE: docker
     networks:
       - spring
 
-  api-gateway:
+  product-service:
+    image: product-service
     ports:
-      - "8180:8180"
+      - "8089:8089"
     build:
-      context: ./api-gateway
+      context: ./product-service
       dockerfile: ./Dockerfile
-    image: api-gateway:1.0
-    container_name: api-gateway
+    container_name: product-service
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - DISCOVERY_SERVER_URL=http://discovery-service:8761
-    networks:
-      - spring
-
-
-  mongodb:
-    ports:
-      - "27017:27017"
-    image: mongo:latest
-    container_name: mongodb
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=rootadmin
-      - MONGO_INITDB_ROOT_PASSWORD=password
-    volumes:
-      - ./data/mongo/products:/data/db # source:destination
-      - ./data/mongo/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-    restart: unless-stopped
-    command: mongod --auth
-    networks:
-      - spring
-
-  mongodb-express:
-    ports:
-      - "8081:8081"
-    image: mongo-express
-    container_name: mongo-express-1
-    environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=rootadmin
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
-      - ME_CONFIG_MONGODB_SERVER=mongodb
-    restart: unless-stopped
+      SPRING_PROFILES_ACTIVE: docker
+      eureka.client.serviceUrl.defaultZone: http://discovery-service:8761/eureka
     depends_on:
       - mongodb
     networks:
       - spring
 
   postgres-order:
+    image: postgres
     ports:
-      - "5431:5432"
-    image: postgres:latest
-    container_name: Postgres-Order
+      - "5433:5432"
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=order-service
     volumes:
-      - ./data/postgres/order-service:/data/postgres # source:destination
+      - ./data/postgres/order-service:/data/postgres
       - ./init/postgres/order-service/init.sql:/docker-entrypoint-initdb.d/init.sql
+    container_name: postgres-order
     restart: unless-stopped
     networks:
       - spring
 
+  postgres-keycloak:
+    image: postgres
+    ports:
+      - "5431:5432"
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: password
+      PBDATA: /data/postgres
+    volumes:
+      - ./data/postgres/postgres-keycloak:/data/postgres
+    container_name: postgres-keycloak
+    restart: unless-stopped
+    networks:
+      - spring
 
   postgres-inventory:
+    image: postgres
     ports:
       - "5434:5432"
-    image: postgres:latest
-    container_name: Postgres-Inventory
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=inventory-service
     volumes:
-      - ./data/postgres/inventory-service:/data/postgres # source:destination
+      - ./data/postgres/inventory-service:/data/postgres
       - ./init/postgres/inventory-service/init.sql:/docker-entrypoint-initdb.d/init.sql
+    container_name: postgres-inventory
     restart: unless-stopped
     networks:
       - spring
 
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=rootadmin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:
+      - ./data/mongo/products:/data/db
+      - ./data/mongo/docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    container_name: mongodb
+    restart: unless-stopped
+    command: mongod --auth
+    networks:
+      - spring
+
   pgadmin:
+    image: dpage/pgadmin4
+    restart: unless-stopped
     ports:
       - "8888:80"
-    image: dpage/pgadmin4:latest
-    container_name: PgAdmin-1
     environment:
       - PGADMIN_DEFAULT_EMAIL=user@domain.ca
       - PGADMIN_DEFAULT_PASSWORD=password
+    container_name: pgadmin-multiple-gbc
+    networks:
+      - spring
+
+  mongo-express:
+    image: mongo-express
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=rootadmin
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+    container_name: mongodb-express
+    restart: unless-stopped
+    depends_on:
+      - mongodb
+    networks:
+      - spring
+
+  zipkin-service:
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    container_name: zipkin
     restart: unless-stopped
     networks:
       - spring
 
 networks:
-  spring:
-    driver: bridge
+    spring:
+        driver: bridge
+        

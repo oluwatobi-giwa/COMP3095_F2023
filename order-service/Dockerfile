@@ -1,18 +1,36 @@
-# Build Stage
-FROM gradle:8.3-jdk17 AS builder
+#--------------------------------
+#Dockerfile for order-service
+#--------------------------------
+
+#-------------
+#Build Stage
+#-------------
+
+#base image
+FROM gradle:8-jdk17-alpine AS builder
+
+#Copy the application files from the host machine to the image filesystem
 COPY --chown=gradle:gradle . /home/gradle/src
+
+#Set the directory within the image, for executing future commands
 WORKDIR /home/gradle/src
+
+#Run gradle build within the container - NOT THE HOST MACHINE
 RUN gradle build -x test
 
-# Package Stage
-FROM openjdk:17
+#----------------
+#Package Stage
+#----------------
+FROM openjdk:17-alpine
+
 RUN mkdir /app
+
 COPY --from=builder /home/gradle/src/build/libs/*.jar /app/order-service.jar
 
-EXPOSE 8082
+ENV POSTGRES_USER=admin \
+    POSTGRES_PASSWORD=password
 
-ENV SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5431/order-service \
-SPRING_DATASOURCE_USERNAME=admin \
-SPRING_DATASOURCE_PASSWORD=password
+EXPOSE 8087
 
 ENTRYPOINT ["java", "-jar", "/app/order-service.jar"]
+

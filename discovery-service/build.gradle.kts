@@ -15,24 +15,21 @@ repositories {
     mavenCentral()
 }
 
-extra["springCloudVersion"] = "2022.0.4"
-
 dependencies {
+
+
     implementation("org.springframework.boot:spring-boot-starter")
-    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-server")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-}
+    implementation("org.springframework.cloud:spring-cloud-starter-netflix-eureka-server:4.0.3")
+    implementation("org.springframework.boot:spring-boot-starter-security:3.1.5")
 
-dependencyManagement {
-    imports {
-        mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
-    }
-}
+    implementation("io.micrometer:micrometer-observation:1.12.0")
+    implementation("io.micrometer:micrometer-tracing-bridge-brave:1.2.0")
+    implementation("io.zipkin.reporter2:zipkin-reporter-brave:2.16.4")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
 
+
+}
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-tasks.bootBuildImage {
-    builder.set("paketobuildpacks/builder-jammy-base:latest")
 }

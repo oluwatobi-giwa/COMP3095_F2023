@@ -2,46 +2,52 @@ package ca.gbc.productservice.controller;
 
 import ca.gbc.productservice.dto.ProductRequest;
 import ca.gbc.productservice.dto.ProductResponse;
-import ca.gbc.productservice.service.ProductService;
+import ca.gbc.productservice.service.ProductServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpHeaders;
 
 import java.util.List;
 
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/product")
+@RequiredArgsConstructor
+
 public class ProductController {
-    private final ProductService productService;
+
+    private final ProductServiceImpl productService;
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void createProduct(@RequestBody ProductRequest productRequest) {
+    public void createProduct(@RequestBody ProductRequest productRequest){
         productService.createProduct(productRequest);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<ProductResponse> getAllProducts() {
+    public List<ProductResponse> getAllProducts(){
         return productService.getAllProducts();
     }
 
-    @PutMapping({"/{id}"})
-    public ResponseEntity<?> updateProduct(@PathVariable String id, @RequestBody ProductRequest productRequest) {
-        String updatedId = productService.updateProduct(id, productRequest);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("Location", "/api/product/" + updatedId);
-        return new ResponseEntity<>(httpHeaders, HttpStatus.NO_CONTENT);
+    @PutMapping({"/{productId}"})
+    public ResponseEntity<?> updateProduct(@PathVariable("productId")String productId,
+                                           @RequestBody ProductRequest productRequest){
+
+        String updateProductId = productService.updateProduct(productId, productRequest);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/api/product/" + updateProductId);
+
+        return new ResponseEntity<>(headers, HttpStatus.NO_CONTENT);
     }
 
-    @DeleteMapping({"/{id}"})
-    public ResponseEntity<?> deleteProduct(@PathVariable String id) {
-        productService.deleteProduct(id);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.add("Location", "/api/product/" + id);
-        return new ResponseEntity<>(httpHeaders, HttpStatus.NO_CONTENT);
-    }
+    @DeleteMapping("/{productId}")
 
+    public ResponseEntity<?> deleteProduct(@PathVariable("productId")String productId){
+        productService.deleteProduct(productId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }
+

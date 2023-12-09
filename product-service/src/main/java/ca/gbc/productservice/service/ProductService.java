@@ -2,73 +2,14 @@ package ca.gbc.productservice.service;
 
 import ca.gbc.productservice.dto.ProductRequest;
 import ca.gbc.productservice.dto.ProductResponse;
-import ca.gbc.productservice.model.Product;
-import ca.gbc.productservice.repository.ProductRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Slf4j
-@Service
-@RequiredArgsConstructor
-public class ProductService implements IProductService{
-    private final ProductRepository productRepository;
-    private final MongoTemplate mongoTemplate;
-    @Override
-    public void createProduct(ProductRequest productRequest) {
-        log.info("Creating a new product {}", productRequest.getName());
-        Product product = Product.builder()
-                        .name(productRequest.getName())
-                        .description(productRequest.getDescription())
-                        .price(productRequest.getPrice())
-                        .build();
+public interface ProductService {
 
-        productRepository.save(product);
-        log.info("Product {} is saved", product.getId());
-    }
+    void createProduct(ProductRequest productRequest);
+    String updateProduct(String productId, ProductRequest productRequest);
+    void deleteProduct(String productId);
 
-    @Override
-    public List<ProductResponse> getAllProducts() {
-        log.info("Returning product list");
-        List<Product> products = productRepository.findAll();
-        return products.stream().map(this::mapToProductResponse).toList();
-    }
-
-    private ProductResponse mapToProductResponse(Product product) {
-        return ProductResponse.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .build();
-    }
-
-    @Override
-    public String updateProduct(String id, ProductRequest productRequest) {
-        log.info("Updating product with id {}", id);
-        Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(id));
-        Product product = mongoTemplate.findOne(query, Product.class);
-
-        if (product != null) {
-            product.setName(productRequest.getName());
-            product.setDescription(productRequest.getDescription());
-            product.setPrice(productRequest.getPrice());
-
-            log.info("Product is updated {}", id);
-            return productRepository.save(product).getId();
-        }
-        return id;
-    }
-
-    @Override
-    public void deleteProduct(String id) {
-        log.info("Deleting product with id {}", id);
-        productRepository.deleteById(id);
-    }
+    List<ProductResponse> getAllProducts();
 }

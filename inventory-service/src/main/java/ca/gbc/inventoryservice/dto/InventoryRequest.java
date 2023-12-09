@@ -1,12 +1,17 @@
 package ca.gbc.inventoryservice.dto;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+
 public class InventoryRequest {
+
     private String skuCode;
-    private int quantity;
+    private Integer quantity;
 }
