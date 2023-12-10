@@ -24,14 +24,14 @@ public class InventoryServiceImpl implements InventoryService{
     @Transactional(readOnly = true)
     @SneakyThrows
     public List<InventoryResponse>isInStock(List<InventoryRequest> requests) {
-        log.info("Wait Started");
+        /*log.info("Wait Started");
         try {
             Thread.sleep(10000);
         } catch (InterruptedException e) {
             log.error("Thread interrupted while waiting: {}", e.getMessage());
             Thread.currentThread().interrupt();
         }
-        log.info("Wait Stopped");
+        log.info("Wait Stopped");*/
 
         List<Inventory> availableInventory = inventoryRepository.findAllByInventoryRequest(requests);
 
